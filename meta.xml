@@ -1,0 +1,10 @@
+<meta>
+    <info author="andr0xy" type="script" name="Discord App" version="1.0.0" />
+
+    <script src="server/discord.lua" type="server" />
+    <script src="client/ui.lua" type="client" />
+
+    <file src="assets/images/discord.png" />
+
+    <export function="discordRequest" type="server" http="true" />
+</meta>
