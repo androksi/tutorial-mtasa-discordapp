@@ -1,9 +1,7 @@
 local discordInfo = {}
-
-function discordRequest(command, admin, ...)
-    local args = {...}
-
-    if command == "settime" then
+local discordCommands = {
+    -- Funções/Comandos que serão executados pelo BOT
+    ["settime"] = function(admin, args)
         local hour, minute = args[1], args[2]
         local success = setTime(hour, minute)
         
@@ -13,10 +11,12 @@ function discordRequest(command, admin, ...)
         else
             return "algo deu errado. Use o comando novamente usando-o corretamente. "
         end
-    elseif command == "text" then
+    end,
+    ["text"] = function(admin, args)
         outputMessage(admin .. " #ffffffdisse: " .. args[1])
         return "sua mensagem ``" .. args[1] .. "`` foi enviada."
-    elseif command == "status" then
+    end,
+    ["status"] = function(admin, args)
         local online = getPlayerCount()
         local maxPlayers = getMaxPlayers()
         local serverName = getServerName()
@@ -30,7 +30,8 @@ function discordRequest(command, admin, ...)
             serverIp = serverIp,
             serverPort = serverPort
         }
-    elseif command == "mute" then
+    end,
+    ["mute"] = function(admin, args)
         local player = getPlayerFromName(args[1])
         
         if isElement(player) then
@@ -42,7 +43,8 @@ function discordRequest(command, admin, ...)
         else
             return "**" .. args[1] .. "** está inválido."
         end
-    elseif command == "givemoney" then
+    end,
+    ["givemoney"] = function(admin, args)
         local player = getPlayerFromName(args[1])
         local amount = tonumber(args[2])
 
@@ -58,7 +60,8 @@ function discordRequest(command, admin, ...)
         givePlayerMoney(player, amount)
         outputMessage(admin .. " #ffffffdeu #008500R$" .. amount .. " #ffffffpara " .. playerName .. "!")
         return "**" .. playerName .. "** recebeu ``R$" .. amount .. "``."
-    elseif command == "cgroup" then
+    end,
+    ["cgroup"] = function(admin, args)
         local groupName = args[1]
 
         if groupName then
@@ -74,13 +77,25 @@ function discordRequest(command, admin, ...)
 
             return "grupo com o nome ``" .. groupName .. "`` foi adicionado à ACL."
         end
-    elseif command == "uuu" and admin == "Console" then
-        discordInfo.members = args[1]
-        discordInfo.inviteCode = args[2]
-        discordInfo.guildName = args[3]
+    end,
+    ["uuu"] = function(admin, args)
+        if admin == "Console" then
+            discordInfo.members = args[1]
+            discordInfo.inviteCode = args[2]
+            discordInfo.guildName = args[3]
 
-        updateInfo()
+            updateInfo()
+        end
     end
+}
+
+function discordRequest(command, admin, ...)
+    if not discordCommands[command] then
+        return "o comando não existe no servidor MTA."
+    end
+
+    local args = {...}
+    return discordCommands[command](admin, args)
 end
 
 function updateInfo()
